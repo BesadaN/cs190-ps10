@@ -79,7 +79,19 @@ class TableViewController: UITableViewController {
         let tableView = sender as! UITableView
         let row = tableView.indexPathForSelectedRow!.row
         let plistFilename = plistFilenames[row]
-        let plistTitle = (try? titleForPlist(plistFilename)) ?? "<No Title Found!>"
+        var plistTitle = (try? titleForPlist(plistFilename)) ?? "<No Title Found!>"
+        var errorMessage: String = ""
+        do {
+            plistTitle = try titleForPlist(plistFilename)
+        } catch TitledPlistReaderError.FileDoesNotExist {
+            errorMessage = "This plist is unattainable."
+        } catch TitledPlistReaderError.BadPlist {
+            errorMessage = "This plist is corrupted."
+        } catch TitledPlistReaderError.UntitledPlist {
+            errorMessage = "This plist is not named."
+        } catch {
+            errorMessage = "Unknown error."
+        }
         let destinationViewController = segue.destinationViewController as! TitleViewController
         destinationViewController.plistTitle = plistTitle
     }
